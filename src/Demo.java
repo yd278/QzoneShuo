@@ -24,8 +24,9 @@ public class Demo {
 
         File file = new File("result.txt");
         FileWriter fileWriter = new FileWriter(file);
+        fileWriter.write(result.size() + "\n:");
         for( String s : result){
-            fileWriter.write(s + "\n");
+            fileWriter.write(s);
         }
         fileWriter.close();
     }
@@ -69,7 +70,7 @@ public class Demo {
         boolean notEnd = true;
         while (notEnd) {
             try {
-                Thread.sleep(3000);
+                Thread.sleep(4000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -79,11 +80,24 @@ public class Demo {
                 String shuoResult = "";
                 String content = shuo.findElement(By.cssSelector(".content")).getText();
                 String time = shuo.findElement(By.cssSelector(".c_tx.c_tx3.goDetail")).getAttribute("title");
-                shuoResult += time + "\n" + content;
                 try{
-                    WebElement pre = shuo.findElement(By.cssSelector(".quote.bor2")).findElement(By.cssSelector(".bd"));
-                    shuoResult += " 【转自：】 " + pre.getText();
+                    try{
+                        WebElement extend = shuo.findElement(By.linkText("展开查看全文"));
+                        extend.click();
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }catch(NoSuchElementException ignored){
+                    }
+                    List<WebElement> pre = shuo.findElement(By.cssSelector(".quote.bor2")).findElement(By.cssSelector(".bd")).findElements(By.xpath("./*"));
+                    String preAuthor = pre.get(0).getText();
+                    String preContent = pre.get(1).getText();
+                    time = shuo.findElements(By.cssSelector(".c_tx.c_tx3.goDetail")).get(1).getAttribute("title");
+                    shuoResult += time + "\n" + content + "\n" + " 【转自：】 " + preAuthor + "\n" + preContent + "\n";
                 }catch(NoSuchElementException ignored){
+                    shuoResult += time + "\n" + content + "\n";
                 }
                 result.add(shuoResult);
             }
